@@ -1,0 +1,125 @@
+[project]
+name = "licenseclassifier"
+# CalVer, YYYY.MM.MICRO -- read from licenseclassifier.__version__ so there is exactly one
+# place to bump. Months are never zero-padded: PEP 440 normalises "2026.07.0" to "2026.7.0",
+# and a version that renames itself during the build breaks the tag check in release.yml.
+dynamic = ["version"]
+description = "Pure-Python SPDX license identification from license text"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "NOTICE", "third_party/licensecheck/LICENSE"]
+authors = [{ name = "Fencer Security", email = "opensource@fencer.dev" }]
+keywords = ["spdx", "license", "license-detection", "sbom", "compliance", "licensecheck"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Legal Industry",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Text Processing :: Linguistic",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Fencer-Security/licenseclassifier"
+Source = "https://github.com/Fencer-Security/licenseclassifier"
+Issues = "https://github.com/Fencer-Security/licenseclassifier/issues"
+Changelog = "https://github.com/Fencer-Security/licenseclassifier/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+# Installed into each interpreter's virtualenv by the nox `tests` session, so this is the
+# single source of truth for what the suite needs. tomllib is stdlib from 3.11 on; the
+# packaging-consistency test needs a reader on 3.10 too.
+test = ["pytest>=8.0", "coverage[toml]>=7.0", "tomli>=2.0; python_version < '3.11'"]
+dev = [{ include-group = "test" }, "nox>=2025.5.1"]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.dynamic]
+version = { attr = "licenseclassifier.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"licenseclassifier" = ["py.typed"]
+"licenseclassifier._engine" = ["licenses.json.gz", "scanner.bin.gz"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-config", "--strict-markers", "--import-mode=importlib"]
+xfail_strict = true
+# Escalate warnings to failures: on a prerelease interpreter a new DeprecationWarning is the
+# earliest signal that something we rely on is going away, and it is silent otherwise.
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["licenseclassifier"]
+# Branch coverage matters more than line coverage here: the engine is mostly dense
+# conditionals ported from Go, where a line runs but only ever down one side.
+branch = true
+
+[tool.coverage.paths]
+# Each interpreter's venv has its own editable install; map them onto src/ so
+# `coverage combine` merges the matrix into one report instead of six.
+source = ["src/licenseclassifier", "*/site-packages/licenseclassifier"]
+
+[tool.coverage.report]
+show_missing = true
+precision = 1
+# Measured across the whole matrix; raise it, never lower it.
+fail_under = 100
+# Everything excluded below is code proven unreachable through the package's own API. It is
+# listed here rather than as `# pragma` comments in the sources so the modules under _engine/
+# stay line-for-line comparable with the Go originals they were ported from.
+exclude_also = [
+  "if TYPE_CHECKING:",
+  # Entry-point guard: main() itself is tested, this line only runs under `python -m`.
+  "if __name__ == .__main__.:",
+  # Defensive raises for syntax-tree states the parser cannot construct: OP_LEFT_PAREN and
+  # OP_VERTICAL_BAR are the only pseudo-ops ever built, neither is collected into a sub-list,
+  # and re_parse rejects a pseudo-op at the root. Checked by exhaustively parsing every token
+  # sequence up to length five (~66k patterns): the raise sites reachable from a pattern are
+  # resyntax.py 80, 91, 94 and 183, all of which are tested.
+  "raise ValueError\\(f\"unexpected op",
+  "raise ValueError\\(\"bad op in phrases\"\\)",
+  "if re2\\.op != OP_LEFT_PAREN:",
+]
+partial_branches = [
+  "pragma: no branch",
+  # Scanner.scan iterates `matches + [(-1, nwords, nwords)]`, and the sentinel's `if mid < 0`
+  # always breaks, so the loop has no normal exit for coverage to observe.
+  "for mid, mstart, mend in matches",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# The modules under _engine/ are a line-by-line port of licensecheck's Go sources, kept
+# structurally close to the original so the two can be diffed when upstream changes. These
+# rules would each "simplify" the Python away from that correspondence for no behavioural gain.
+ignore = [
+  "SIM103", # matcher.py: mirrors the reference implementation's explicit branch
+  "SIM114", # matcher.py: mirrors the reference implementation's separate cases
+  "RUF023", # resyntax.py: __slots__ order follows the Go struct field order
+]
+
+[tool.ruff.format]
+quote-style = "double"

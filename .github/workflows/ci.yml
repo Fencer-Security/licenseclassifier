@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # One job per interpreter so a single version's failure is legible in the checks list.
+    # Keep this matrix in step with SUPPORTED in noxfile.py and the Python classifiers in
+    # pyproject.toml -- tests/test_supported_versions.py fails if they drift.
+    name: test (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Run tests
+        # uv resolves and downloads the interpreter, prereleases included, so 3.15 needs no
+        # special casing here. The data file is named for the version, matching noxfile.py.
+        run: >
+          uv run --group test --python ${{ matrix.python-version }}
+          coverage run --data-file=.coverage.${{ matrix.python-version }} -m pytest
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: .coverage.${{ matrix.python-version }}
+          include-hidden-files: true
+          retention-days: 1
+
+  coverage:
+    # Merges every interpreter's data before reporting, so a branch reachable on only one
+    # version is not counted as uncovered. Enforces fail_under from pyproject.toml.
+    # No `if: always()`: with a failed test job the data would be incomplete, and a bogus
+    # coverage failure on top of a real test failure is just noise.
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+      - name: Check every interpreter reported in
+        # Otherwise a dropped artifact silently lowers the percentage instead of failing.
+        run: |
+          for v in 3.10 3.11 3.12 3.13 3.14 3.15; do
+            test -f ".coverage.$v" || { echo "::error::missing coverage data for $v"; exit 1; }
+          done
+      # NEWEST_STABLE in noxfile.py, and pinned rather than left to uv's default on purpose:
+      # coverage counts statements by parsing the source with the interpreter running the
+      # report, and that count changes across versions (license_identifier.py is 16 statements
+      # on 3.10-3.13 and 13 on 3.14+). An unpinned reporter makes CI's totals disagree with a
+      # local `uvx nox` run for identical code. The percentage is unaffected; the denominator
+      # is not, and a denominator that moves on its own is not worth debugging twice.
+      - name: Combine
+        run: uv run --with 'coverage[toml]' --no-project --python 3.14 coverage combine
+      - name: Report
+        # pipefail matters: without it `tee` would swallow coverage's non-zero exit and a
+        # coverage regression below fail_under would pass silently.
+        run: |
+          set -o pipefail
+          uv run --with 'coverage[toml]' --no-project --python 3.14 coverage report | tee /tmp/cov.txt
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo '### Coverage (all interpreters combined)'
+            echo '```'
+            cat /tmp/cov.txt 2>/dev/null || echo '(no report produced)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/ruff-action@v3
+      - run: ruff check .
+      - run: ruff format --check .
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          # NEWEST_STABLE in noxfile.py: release artifacts are not built by a prerelease.
+          python-version: "3.14"
+      - run: pip install build twine
+      - run: python -m build
+      - name: Check distribution metadata
+        run: twine check --strict dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

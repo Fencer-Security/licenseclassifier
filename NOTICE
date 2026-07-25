@@ -1,0 +1,46 @@
+licenseclassifier
+Copyright (c) 2026 Fencer Security. All rights reserved.
+
+This product includes software and data developed by third parties.
+
+
+-------------------------------------------------------------------------------
+github.com/google/licensecheck (v0.3.1)
+-------------------------------------------------------------------------------
+
+Copyright (c) 2019 The Go Authors. All rights reserved.
+Licensed under the BSD 3-Clause License.
+
+Homepage:     https://github.com/google/licensecheck
+Full license: third_party/licensecheck/LICENSE
+
+Two things in this project derive from licensecheck:
+
+1. The license-identification algorithm. The modules under
+   src/licenseclassifier/_engine/ are a Python port of licensecheck's Go
+   sources — dictionary.py from internal/match/dict.go, resyntax.py from
+   internal/match/resyntax.go, matcher.py from internal/match/rematch.go and
+   internal/match/regexp.go, and scan.py from scan.go.
+
+2. The built-in license patterns. src/licenseclassifier/_engine/licenses.json.gz
+   is the contents of licensecheck's licenses/ directory (the LRE pattern
+   corpus), converted to JSON. src/licenseclassifier/_engine/scanner.bin.gz is a
+   compiled form of that same data.
+
+Neither the name "Google Inc." nor the names of the Go Authors or any other
+licensecheck contributor are used here to endorse or promote this project. The
+references above are factual attribution only. This project is not affiliated
+with, endorsed by, or supported by Google or the Go Authors.
+
+
+-------------------------------------------------------------------------------
+SPDX License List (v3.10)
+-------------------------------------------------------------------------------
+
+licensecheck's LRE patterns were themselves machine-converted from the SPDX
+License List matching templates and then hand-corrected. The SPDX License List
+data is published by the SPDX Legal Team under CC0-1.0 (public domain
+dedication), so it carries no attribution requirement — noted here for
+provenance only.
+
+Homepage: https://spdx.org/licenses/

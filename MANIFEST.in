@@ -1,0 +1,4 @@
+include CHANGELOG.md
+recursive-include tests *
+recursive-include third_party *
+global-exclude __pycache__ *.py[cod]

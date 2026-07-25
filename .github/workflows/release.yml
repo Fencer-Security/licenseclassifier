@@ -1,0 +1,174 @@
+name: Release
+
+# Publishes to PyPI via a Trusted Publisher (OIDC): no API token is stored anywhere. PyPI
+# must be configured to trust this repository with:
+#
+#   Workflow name:    release.yml
+#   Environment name: pypi
+#
+# Publishing is gated on the built wheel being installed and exercised on every supported
+# interpreter first, because the failure this package is most exposed to -- a scanner.bin.gz
+# that does not deserialize -- is silent: the library falls back to compiling from source and
+# still returns correct answers, just far more slowly. A wheel can only be caught being wrong
+# by importing it from outside the source tree, which is what the smoke-test job does.
+
+on:
+  push:
+    tags: ["v*"]
+  # Lets a release be re-run after fixing a transient publish failure. The version guard in
+  # `build` means this can only ever publish the version the tag already points at.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          # NEWEST_STABLE in noxfile.py: release artifacts are not built by a prerelease.
+          python-version: "3.14"
+
+      - run: pip install build twine
+      - run: python -m build
+
+      - name: Check distribution metadata
+        run: twine check --strict dist/*
+
+      - name: Check the tag matches the built version, and the version is CalVer
+        # Checked against the built artifacts rather than pyproject.toml, because the version is
+        # dynamic (read from licenseclassifier.__version__) and because the filename is what
+        # actually lands on PyPI. PEP 440 rewrites some versions during the build -- a
+        # zero-padded month, say -- so comparing the tag to the source string is not enough.
+        run: |
+          python - <<'PY'
+          import os, pathlib, re, sys
+          from packaging.utils import parse_sdist_filename, parse_wheel_filename
+
+          dist = pathlib.Path("dist")
+          wheels = sorted(dist.glob("*.whl"))
+          sdists = sorted(dist.glob("*.tar.gz"))
+          # Picking one arbitrarily out of a dist/ holding leftovers from an earlier version
+          # would validate the tag against a file that is not the one being released.
+          if len(wheels) != 1 or len(sdists) != 1:
+              print(f"::error::expected exactly one wheel and one sdist in dist/, found "
+                    f"{[p.name for p in wheels + sdists]}")
+              sys.exit(1)
+
+          wheel_version = str(parse_wheel_filename(wheels[0].name)[1])
+          sdist_version = str(parse_sdist_filename(sdists[0].name)[1])
+          errors = []
+
+          if wheel_version != sdist_version:
+              errors.append(f"wheel is {wheel_version} but sdist is {sdist_version}")
+
+          # YYYY.MM.MICRO with an unpadded 1-12 month. Also rejects a stray SemVer bump.
+          m = re.fullmatch(r"(\d{4})\.(\d{1,2})\.(\d+)", wheel_version)
+          if not m:
+              errors.append(f"version {wheel_version!r} is not CalVer YYYY.MM.MICRO")
+          elif not 1 <= int(m.group(2)) <= 12:
+              errors.append(f"version {wheel_version!r} has month {m.group(2)}, expected 1-12")
+
+          ref = os.environ.get("GITHUB_REF", "")
+          if ref.startswith("refs/tags/"):
+              tag = os.environ["GITHUB_REF_NAME"].removeprefix("v")
+              if tag != wheel_version:
+                  errors.append(
+                      f"tag v{tag} does not match the built version {wheel_version}; "
+                      f"the tag for this build is v{wheel_version}"
+                  )
+
+          if errors:
+              for e in errors:
+                  print(f"::error::{e}")
+              sys.exit(1)
+          print(f"Releasing {wheel_version}")
+          PY
+
+      - name: Check the prebuilt scanner is actually in the wheel
+        # The wheel is useless-but-silent without it, and package-data globs are easy to break.
+        run: |
+          python - <<'PY'
+          import pathlib, zipfile
+          wheel = next(iter(pathlib.Path("dist").glob("*.whl")))
+          names = zipfile.ZipFile(wheel).namelist()
+          required = [
+              "licenseclassifier/_engine/scanner.bin.gz",
+              "licenseclassifier/_engine/licenses.json.gz",
+              "licenseclassifier/py.typed",
+          ]
+          missing = [n for n in required if n not in names]
+          if missing:
+              raise SystemExit(f"{wheel.name} is missing {missing}")
+          print(f"{wheel.name} contains all required data files")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  smoke-test:
+    # Runs the real test suite against the built wheel on every supported interpreter, rather
+    # than a token import. The checkout is sparse on purpose: it brings in tests/ and the
+    # pytest config but NOT src/, so `import licenseclassifier` can only resolve to the
+    # installed wheel. That is the difference between testing what ships and testing the
+    # working tree that happens to be next to it.
+    needs: build
+    name: smoke-test (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tests
+            pyproject.toml
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install the wheel
+        run: |
+          uv venv --python ${{ matrix.python-version }} /tmp/venv
+          uv pip install --python /tmp/venv/bin/python \
+            "$(ls dist/*.whl)" pytest 'tomli; python_version < "3.11"'
+
+      - name: Confirm the import resolves to the wheel, not a source tree
+        run: |
+          test ! -d src || { echo "::error::src/ was checked out; the suite would not test the wheel"; exit 1; }
+          /tmp/venv/bin/python -c "
+          import licenseclassifier as m
+          print(m.__file__)
+          assert 'site-packages' in m.__file__, m.__file__
+          "
+
+      - name: Run the suite against the wheel
+        run: /tmp/venv/bin/python -m pytest
+
+  publish:
+    needs: [build, smoke-test]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # The OIDC token PyPI exchanges for a short-lived upload credential.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

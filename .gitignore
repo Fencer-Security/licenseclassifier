@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+
+build/
+dist/
+*.egg-info/
+
+.venv/
+venv/
+.nox/
+
+# The library has no runtime dependencies, and the nox sessions install the test group
+# directly rather than from a lock, so a committed lockfile would pin nothing that matters.
+uv.lock
+
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+.DS_Store
