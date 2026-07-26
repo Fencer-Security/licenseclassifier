@@ -1,0 +1,21 @@
+# SPDX licence IDs this project deliberately does not recognise, and why.
+#
+# Every one of these is a case where SPDX defines separate IDs for a distinction that the licence
+# text does not actually carry, so a scanner reporting one of them would be inventing information.
+# licensecheck reached the same conclusions and documents them in its licenses/README.md; they are
+# repeated here because tools/refresh_spdx.py reads this file to decide what not to add, and
+# without it every refresh would propose them again.
+#
+# Format: <licence ID><TAB><reason>
+
+CAL-1.0-Combined-Work-Exception	The combined-work exception is a per-file annotation, not part of the licence text; only CAL-1.0 is observable.
+GFDL-1.1-only	The -only/-or-later distinction is made by the file header, not the licence text. The corpus reports GFDL-1.1 for the text and the -invariants- forms for headers.
+GFDL-1.1-or-later	See GFDL-1.1-only.
+GFDL-1.2-only	See GFDL-1.1-only.
+GFDL-1.2-or-later	See GFDL-1.1-only.
+GFDL-1.3-only	See GFDL-1.1-only.
+GFDL-1.3-or-later	See GFDL-1.1-only.
+OFL-1.0-RFN	Whether a reserved font name applies is not something the licence text states, and the SPDX patterns for these variants do not capture the intended distinction. The corpus reports OFL-1.0.
+OFL-1.0-no-RFN	See OFL-1.0-RFN.
+OFL-1.1-RFN	See OFL-1.0-RFN.
+OFL-1.1-no-RFN	See OFL-1.0-RFN.

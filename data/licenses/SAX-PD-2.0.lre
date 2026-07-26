@@ -1,0 +1,17 @@
+//**
+SAX-PD-2.0
+https://spdx.org/licenses/SAX-PD-2.0.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+((
+((
+SAX 2.0
+|| SAX IS FREE
+|| SAX2 is Free!
+))
+__5__
+))??
+I hereby abandon any property rights to SAX 2.0 (the Simple API for XML), and release all of the SAX 2.0 source code, compiled code, and documentation contained in this distribution into the Public Domain. SAX comes with NO WARRANTY or guarantee of fitness for any purpose.
+__50__

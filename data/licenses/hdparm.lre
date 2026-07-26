@@ -1,0 +1,13 @@
+//**
+hdparm
+https://spdx.org/licenses/hdparm.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+BSD-Style Open Source License:
+
+You may freely use, modify, and redistribute the hdparm program, as either binary or source, or both.
+
+The only condition is that my name and copyright notice remain in the source code as-is.
+__50__

@@ -1,0 +1,26 @@
+//**
+FSFULLRWD
+https://spdx.org/licenses/FSFULLRWD.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+This
+((
+Makefile.in
+|| file
+))
+ is free software;
+((
+as a special exception the author
+|| the Free Software Foundation
+))
+ gives unlimited permission to copy and/or distribute it, with or without modifications, as long as this notice is preserved.
+
+This
+((
+program
+|| file
+))
+ is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY, to the extent permitted by law; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

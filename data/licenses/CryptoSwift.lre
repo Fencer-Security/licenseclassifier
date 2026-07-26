@@ -1,0 +1,21 @@
+//**
+CryptoSwift
+https://spdx.org/licenses/CryptoSwift.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+This software is provided 'as-is', without any express or implied warranty.
+
+In no event will the authors be held liable for any damages arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+__5__
+ The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation is required.
+__5__
+ Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+__5__
+ This notice may not be removed or altered from any source or binary distribution.
+__5__
+ Redistributions of any form whatsoever must retain the following acknowledgment: 'This product includes software developed by the "Marcin Krzyzanowski" (http://krzyzanowskim.com/).'

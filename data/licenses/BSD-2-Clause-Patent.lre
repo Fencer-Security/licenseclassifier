@@ -1,0 +1,157 @@
+//**
+BSD-2-Clause Plus Patent License
+https://spdx.org/licenses/BSD-2-Clause-Patent.json
+https://opensource.org/licenses/BSDplusPatent
+**//
+
+	Redistribution and use
+	((of
+		((this software || __5__))
+	))??
+	in source and binary forms
+	((of __6__))??
+	with or
+	((without))??
+	modification,
+	are permitted
+	((subject to the limitations in the disclaimer below))??
+	((provided || providing))
+	that
+	((the))??
+	following conditions are met:
+	((BSD style license))??
+
+
+	__1__
+	((Redistribution || Redistributions))
+	of
+	((source code || works))
+	must retain the
+	((above))??
+	((original))??
+	copyright
+	((notice))??
+	((immediately at the beginning of the file, without modification))??
+	this
+	((list of conditions || condition))
+	and the
+	((following
+		((two paragraphs of))??
+		disclaimer
+	|| disclaimer that follows))
+	((in this position and unchanged))??
+
+
+	__1__
+	((Redistribution || Redistributions))
+	in binary form must reproduce the
+	((above))??
+	((original))??
+	copyright
+	((notice))??
+	this list of conditions and the
+	following
+	((two pargraphs of))??
+	disclaimer
+	((listed in this license))??
+	in the documentation
+	((and/or || and || or))
+	other materials provided with the distribution.
+
+
+	Subject to the terms and conditions of this license, each copyright holder and
+	contributor hereby grants to those receiving rights under this license a
+	perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+	(except for failure to satisfy the conditions of this license) patent license to
+	make, have made, use, offer to sell, sell, import, and otherwise transfer this
+	software, where such license applies only to those patent claims, already
+	acquired or hereafter acquired, licensable by such copyright holder or
+	contributor that are necessarily infringed by:
+
+	   __1__ their Contribution(s) (the licensed copyrights of copyright holders and
+	   non-copyrightable additions of contributors, in source or binary form) alone;
+	   or
+
+	   __1__ combination of their Contribution(s) with the work of authorship to
+	   which such Contribution(s) was added by such copyright holder or contributor,
+	   if, at the time the Contribution is added, such addition causes such
+	   combination to be necessarily infringed. The patent license shall not apply
+	   to any other combinations which include the Contribution.
+
+	Except as expressly stated above, no rights or licenses from any copyright
+	holder or contributor is granted under this license, whether expressly, by
+	implication, estoppel or otherwise.
+
+
+	((DISCLAIMER
+	))??
+
+	((
+		THE
+		((SOFTWARE || WORK))
+		((AND DOCUMENTATION))??
+		IS PROVIDED
+		((BY __20__))??
+		"AS IS"
+		((
+			((WITHOUT ANY WARRANTIES WHATSOEVER))??
+			((AND))??
+			ANY
+			((EXPRESS || EXPRESSED))
+			OR IMPLIED WARRANTIES,
+			INCLUDING, BUT NOT LIMITED TO,
+			THE IMPLIED WARRANTIES
+			((OF || OR))
+			((NONINFRINGEMENT))??
+			((MERCHANTABILITY))??
+			((AND))??
+			FITNESS FOR A PARTICULAR PURPOSE
+			((OR NONINFRINGEMENT))??
+			ARE
+			((EXPRESSLY AND SPECIFICALLY))??
+			((HEREBY))??
+			DISCLAIMED.
+		||
+			//** Alternate form in libpcap, which also omits the IN NO EVENT paragraph. **//
+			AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+			INCLUDING, WITHOUT LIMITATION,
+			THE IMPLIED WARRANTIES OF MERCHANTABILTY
+			AND FITNESS FOR A PARTICULAR PURPOSE.
+		))
+
+		((
+			IN NO EVENT SHALL __20__ BE LIABLE
+			FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+			CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+			GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+			HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+			LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+			ARISING IN ANY WAY OUT OF THE USE OF THIS
+			((
+				((SOFTWARE || WORK))
+				((AND DOCUMENTATION))??
+				EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+			))??
+		))??
+
+	||
+
+		//**
+		Alternate form found in some recent University of California releases.
+		**//
+		IN NO EVENT SHALL __20__ BE LIABLE
+		TO ANY PARTY FOR DIRECT, INDIRECT,
+		SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+		ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+		__20__ HAS BEEN ADVISED
+		OF THE POSSIBILITY OF SUCH DAMAGE.
+
+		__20__ SPECIFICALLY DISCLAIMS
+		ANY WARRANTIES, INCLUDING, BUT NOT
+		LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+		A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF
+		ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS"
+		__20__ HAS NO OBLIGATION
+		TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+		MODIFICATIONS.
+	))

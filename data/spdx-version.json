@@ -1,0 +1,9 @@
+{
+  "spdx_license_list_version": "v3.28.0",
+  "source": "https://github.com/spdx/license-list-data/tree/v3.28.0",
+  "curated_from": {
+    "project": "github.com/google/licensecheck",
+    "version": "v0.3.1",
+    "spdx_license_list_version": "v3.10"
+  }
+}

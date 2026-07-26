@@ -20,4 +20,7 @@ uv.lock
 .coverage.*
 htmlcov/
 
+# Scratch space for tools/refresh_spdx.py: the upstream license-list-data tree it downloads.
+.spdx-release/
+
 .DS_Store

@@ -1,0 +1,57 @@
+# What each SPDX licence's own canonical text is expected to be identified as, where that is not
+# simply "itself, and nothing else". tools/gate.py scans every text in data/spdx-texts.json.gz and
+# compares against this file; anything unlisted must report exactly its own ID.
+#
+# This is the regression baseline for the corpus. A change to a pattern that alters what some
+# licence text classifies as cannot land without a line here changing too, which is what makes it
+# visible in review rather than a number in a test summary.
+#
+# Format: <licence whose text is scanned><TAB><IDs reported, comma separated, or "-" for none><TAB><why>
+
+AGPL-1.0-only	AGPL-1.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+AGPL-1.0-or-later	AGPL-1.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+AGPL-3.0-only	AGPL-3.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+AGPL-3.0-or-later	AGPL-3.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+GPL-1.0-only	GPL-1.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+GPL-1.0-or-later	GPL-1.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+GPL-2.0-only	GPL-2.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+GPL-2.0-or-later	GPL-2.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+LGPL-2.0-only	LGPL-2.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+LGPL-2.0-or-later	LGPL-2.0	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+LGPL-2.1-only	LGPL-2.1	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+LGPL-2.1-or-later	LGPL-2.1	The text of the licence is the same either way: -only vs -or-later is a distinction the file header makes, so the corpus reports the unsuffixed ID for the licence text itself.
+GPL-3.0-only	GPL-3.0,GPL-3.0-or-later	As for GPL-2.0-only, plus the v3 text ends with a "how to apply" section that is itself an -or-later notice, which the header pattern matches.
+GPL-3.0-or-later	GPL-3.0,GPL-3.0-or-later	The v3 text ends with a "how to apply" section that is itself an -or-later notice, matched as a second region.
+LGPL-3.0-only	LGPL-3.0,GPL-3.0,GPL-3.0-or-later	The LGPL v3 text incorporates the GPL v3 by reference and carries the same "how to apply" section.
+LGPL-3.0-or-later	LGPL-3.0,GPL-3.0,GPL-3.0-or-later	See LGPL-3.0-only.
+GFDL-1.1-invariants-only	GFDL-1.1	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.1-invariants-or-later	GFDL-1.1	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.1-no-invariants-only	GFDL-1.1	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.1-no-invariants-or-later	GFDL-1.1	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.2-invariants-only	GFDL-1.2	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.2-invariants-or-later	GFDL-1.2	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.2-no-invariants-only	GFDL-1.2	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.2-no-invariants-or-later	GFDL-1.2	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.3-invariants-only	GFDL-1.3	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.3-invariants-or-later	GFDL-1.3	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.3-no-invariants-only	GFDL-1.3	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+GFDL-1.3-no-invariants-or-later	GFDL-1.3	The corpus distinguishes invariant sections in a *header*; the licence text alone cannot say whether any are declared, so its text reports the unsuffixed ID.
+MPL-2.0-no-copyleft-exception	MPL-2.0	The exception is declared in Exhibit B of the file it applies to, not in the licence text, so the text is indistinguishable from plain MPL-2.0.
+CAL-1.0-Combined-Work-Exception	CAL-1.0	Deliberately not recognised (data/excluded.txt); its text is CAL-1.0 plus a per-file annotation the text does not carry.
+GFDL-1.1-only	GFDL-1.1	Deliberately not recognised (data/excluded.txt): the -only distinction is made by a file header, so the text reports the unsuffixed ID.
+GFDL-1.1-or-later	GFDL-1.1	Deliberately not recognised (data/excluded.txt): the -or-later distinction is made by a file header, so the text reports the unsuffixed ID.
+GFDL-1.2-only	GFDL-1.2	Deliberately not recognised (data/excluded.txt): the -only distinction is made by a file header, so the text reports the unsuffixed ID.
+GFDL-1.2-or-later	GFDL-1.2	Deliberately not recognised (data/excluded.txt): the -or-later distinction is made by a file header, so the text reports the unsuffixed ID.
+GFDL-1.3-only	GFDL-1.3	Deliberately not recognised (data/excluded.txt): the -only distinction is made by a file header, so the text reports the unsuffixed ID.
+GFDL-1.3-or-later	GFDL-1.3	Deliberately not recognised (data/excluded.txt): the -or-later distinction is made by a file header, so the text reports the unsuffixed ID.
+OFL-1.0-RFN	OFL-1.0	Deliberately not recognised (data/excluded.txt): a reserved font name is not something the text states.
+OFL-1.0-no-RFN	OFL-1.0	Deliberately not recognised (data/excluded.txt): a reserved font name is not something the text states.
+OFL-1.1-RFN	OFL-1.1	Deliberately not recognised (data/excluded.txt): a reserved font name is not something the text states.
+OFL-1.1-no-RFN	OFL-1.1	Deliberately not recognised (data/excluded.txt): a reserved font name is not something the text states.
+GPL-3.0	GPL-3.0,GPL-3.0-or-later	Deprecated by SPDX, kept because real files carry this text. It ends with a "how to apply" section that is itself an -or-later notice, matched as a second region.
+LGPL-3.0	GPL-3.0,GPL-3.0-or-later,LGPL-3.0	Deprecated by SPDX, kept for the same reason as GPL-3.0; the LGPL v3 text incorporates the GPL v3 and its "how to apply" section.
+HPND-Netrek	HPND	The Netrek variant differs from HPND only in wording the pattern treats as variable, so the more general pattern matches at least as much of it and wins on priority. Its own pattern is in the corpus and can still match real files that differ; reporting HPND here is the pre-existing behaviour, not a regression.
+dtoa	HPND	David Gay's dtoa notice is an HPND instance, so the more general pattern matches at least as much of it and wins on priority. Its own pattern is in the corpus and can still match real files that differ; reporting HPND here is the pre-existing behaviour, not a regression.
+metamail	HPND	The metamail notice is an HPND instance, so the more general pattern matches at least as much of it and wins on priority. Its own pattern is in the corpus and can still match real files that differ; reporting HPND here is the pre-existing behaviour, not a regression.
+OpenSSL-standalone	OpenSSL	The standalone form is the OpenSSL licence without the SSLeay half, so the more general pattern matches at least as much of it and wins on priority. Its own pattern is in the corpus and can still match real files that differ; reporting OpenSSL here is the pre-existing behaviour, not a regression.
+X11-swapped	MIT-NoAd	X11-swapped is the MIT no-advertising wording with two clauses transposed, which LRE cannot distinguish, so the more general pattern matches at least as much of it and wins on priority. Its own pattern is in the corpus and can still match real files that differ; reporting MIT-NoAd here is the pre-existing behaviour, not a regression.

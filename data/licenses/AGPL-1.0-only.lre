@@ -1,0 +1,85 @@
+//**
+https://spdx.org/licenses/AGPL-1.0-only.json
+This header is an anachronism - AGPL 1.0 did not define a header.
+**//
+
+	
+	 
+	 
+	 
+	 
+	 
+
+	((
+		((This
+		program
+		))??
+		//**__5__**//
+		is free software: you can redistribute it
+	||
+		You can
+		((uses))??
+		redistribute __5__
+	))
+	and/or modify
+	((it || this code))
+	under the terms of the
+	GNU Affero
+	General Public License
+	((AGPL))??
+	((as published by the Free Software Foundation))??
+	
+		((under))??
+		version 1
+		((AGPLv1))??
+		((of the License))??
+	
+	((as published by the Free Software Foundation))??
+
+	((
+		See the __3__ file for the full terms of the
+		GNU Affero
+		General Public License version
+		1
+	))??
+
+	((
+		__5__ is distributed
+		((in the hope that it will be useful, but))??
+		WITHOUT ANY WARRANTY;
+		without even the implied warranty
+		of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+		See the
+		GNU Affero
+		General Public License for more details.
+
+		((
+			You should have received a copy of the
+			GNU Affero
+			General Public License
+			((
+				((version))??
+				1
+			))??
+			along with
+			((this program))??
+			(( __5__; if not,
+				((
+					write to the Free Software Foundation, Inc.,
+					
+	((
+		51 Franklin
+		((Street||St))
+		((Fifth Floor||Suite 500,))??
+		Boston, MA 02110 __1__ USA
+	||
+		59 Temple Place, Suite 330, Boston, MA  02111 __1__ USA
+	||
+		675 Mass Ave, Cambridge, MA 02139, USA
+	))
+				||
+					see <http://www.gnu.org/licenses/>.
+				))
+			))??
+		))??
+	))??

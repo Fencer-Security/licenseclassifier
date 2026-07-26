@@ -1,0 +1,11 @@
+//**
+checkmk
+https://spdx.org/licenses/checkmk.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+Redistribution of this program in any form, with or without modifications, is permitted, provided that the above copyright is retained in distributions of this program in source form.
+
+(This is a free, non-copyleft license compatible with pretty much any other free or proprietary license, including the GPL. It's essentially a scaled-down version of the "modified" BSD license.)
