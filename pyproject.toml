@@ -63,6 +63,9 @@ where = ["src"]
 minversion = "8.0"
 testpaths = ["tests"]
 addopts = ["-ra", "--strict-config", "--strict-markers", "--import-mode=importlib"]
+# The repository root, so the corpus tests can import tools/. Not needed by the library, which
+# never reads data/ -- it reads the artifact those tools build.
+pythonpath = ["."]
 xfail_strict = true
 # Escalate warnings to failures: on a prerelease interpreter a new DeprecationWarning is the
 # earliest signal that something we rely on is going away, and it is silent otherwise.

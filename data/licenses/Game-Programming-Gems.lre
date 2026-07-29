@@ -1,0 +1,9 @@
+//**
+Game-Programming-Gems
+https://spdx.org/licenses/Game-Programming-Gems.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+This software is provided "as is" without express or implied warranties. You may freely copy and compile this source into applications you distribute provided that the copyright text below is included in the resulting source code, for example: "Portions Copyright (C) Scott Bilas, 2000"

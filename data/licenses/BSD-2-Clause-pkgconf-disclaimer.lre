@@ -1,0 +1,15 @@
+//**
+BSD-2-Clause-pkgconf-disclaimer
+https://spdx.org/licenses/BSD-2-Clause-pkgconf-disclaimer.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+__5__
+   Redistributions of source code must retain the above copyright notice, this list of conditions, and the following disclaimer.
+__5__
+   Redistributions in binary form must reproduce the above copyright notice, this list of conditions, and the following disclaimer in the documentation provided with the distribution.
+
+This software is provided "as is" and without any warranty, express or implied. In no event shall the authors be liable for any damages arising from the use of this software.

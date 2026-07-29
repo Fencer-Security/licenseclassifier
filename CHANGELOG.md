@@ -27,8 +27,66 @@ carries it instead:
 
 ## [Unreleased]
 
+### Added
+
+- **Refreshed the license corpus from SPDX v3.10 to v3.28.0: 423 licenses to 693.** The vendored
+  data had not moved since `google/licensecheck` assembled it in September 2020, so 285 SPDX
+  identifiers were missing — including `BUSL-1.1`, `Elastic-2.0`, `Unicode-3.0`, `CDLA-Permissive-2.0`
+  and the whole `HPND-*` family. 270 of them now have patterns, converted from the SPDX matching
+  templates by `tools/spdx_lre.py`.
+- **Nine licenses the library had silently stopped recognizing now work again.** SPDX reworded
+  `Apache-1.0`, `BitTorrent-1.0`, `CAL-1.0`, `CC-BY-ND-2.5`, `CECILL-2.1`, `MIT-CMU`, `PSF-2.0`,
+  `SGI-B-1.0` and `mpich2` after v3.10, and each pattern quietly stopped matching its own license —
+  a `LICENSE` file with today's wording came back unidentified with no error. Each keeps its original
+  pattern, for the wording still in the wild, and gains a second one for the current text. `NASA-1.3`
+  never matched at all and now does.
+- Measured against every SPDX canonical text, this adds 266 licenses that were previously
+  unidentified and resolves 10 more to a specific variant instead of its parent (for example
+  `BSD-2-Clause-Darwin` rather than `BSD-2-Clause`). **No license that was identified before is
+  identified differently or not at all.**
+- `data/` now holds the corpus as reviewable sources — one plain-text LRE pattern per license, an
+  `order.txt` recording the matcher's tie-break priority, the URL table, and the deliberate
+  exclusions and expectations with reasons attached. `licenses.json.gz` is built from it by
+  `python -m tools.corpus build`, and a test fails if the two drift apart. Before this, a corpus
+  change was a diff of a 700 KB gzip blob.
+- A corpus gate (`tools/gate.py`, `tests/test_license_gates.py`) scans the canonical text of all 708
+  covered licenses and asserts each is identified as itself and nothing else, with deviations
+  recorded in `data/expected-ids.tsv`. This is what makes adding hundreds of near-identical MIT, BSD
+  and HPND variants at once a checkable operation rather than a hopeful one.
+- A monthly `spdx-refresh` workflow runs `tools/refresh_spdx.py` against the newest SPDX release and
+  opens a pull request with the regenerated corpus, the gate output and a summary of what changed.
+  Nothing merges or releases automatically.
+- Spot-checked against real license files rather than only SPDX's canonical texts, which fill their
+  variable slots with `<year>`-style placeholders the tokenizer discards and so never exercise a
+  pattern's wildcards. Elasticsearch's `ELASTIC-LICENSE-2.0.txt` goes from unidentified to
+  `Elastic-2.0`; ICU's `LICENSE` from unidentified (57.8% coverage) to fourteen regions at 82.3%,
+  including `Unicode-3.0`, `ICU`, `NAIST-2003` and `MIT-0`. `BUSL-1.1` needed hand-correcting after
+  conversion — the generated pattern required MariaDB's own copyright year and covenants appendix,
+  which no real BUSL file reproduces. It now matches the Terms section of Terraform's and Vault's
+  licenses, though at ~50% coverage, since half of such a file is the licensor's own Parameters
+  block: `identify_license(text, coverage_threshold=50)` reports it, the default threshold does not.
+
 ### Changed
 
+- The wheel is larger: `licenses.json.gz` 707 KB → 950 KB, `scanner.bin.gz` 435 KB → 601 KB. The
+  first call after import costs ~30 ms rather than ~20 ms, and a cold compile from source (the
+  fallback path) 1.4 s rather than 1.1 s. Steady-state scanning is unchanged at ~2 ms.
+- Memory, measured with the new `python -m tools.benchmark`: deserializing the matcher costs 18 MiB
+  rather than 13 MiB, and a warm scanner classifying common licenses settles at ~82 MiB rather than
+  ~76 MiB. The worst case — a single process that has scanned every license in the corpus — rises
+  from 333 MiB to 406 MiB, because the memoized DFA grows with the number of patterns as well as
+  with the variety of the input. The README now documents this; the short version is that memory
+  tracks input diversity, not input volume, and there is currently no public way to clear the cache.
+- Fifteen SPDX licenses are covered by neither a pattern nor an exclusion: the conversion of their
+  templates could not match their own canonical text, so it was dropped rather than shipped as dead
+  weight. `Cronyx`, `DocBook-DTD`, `DocBook-Stylesheet`, `Furuseth`, `fwlw`, `GD`, `HPND-SMC`,
+  `magaz`, `MIPS`, `ssh-keyscan`, `SunPro`, `TPDL`, `TTWL`, `ulem`, `Zeeff`. Each refresh retries
+  them.
+- Eleven SPDX identifiers are excluded on purpose, following licensecheck's reasoning: SPDX
+  distinguishes them by something the license text does not state (`GFDL-*-only`/`-or-later`,
+  `OFL-*-RFN`/`-no-RFN`, `CAL-1.0-Combined-Work-Exception`). See `data/excluded.txt`.
+- `Net-SNMP` and `bzip2-1.0.5` are still reported although SPDX has deprecated both. Deprecation
+  removes an identifier from the list; it does not remove the text from the files that carry it.
 - Adopted CalVer (`YYYY.MM.MICRO`); the first release is `2026.7.0` rather than `0.1.0`. The version
   now lives only in `licenseclassifier.__version__`, with `pyproject.toml` reading it from there.
 - The test suite is now pytest, run across Python 3.10 through the 3.15 prerelease via `nox` with
@@ -49,6 +107,15 @@ carries it instead:
 - Vendor the parity harness against `google/licensecheck`'s 672 testdata fixtures so the accuracy
   claim is reproducible from a clean checkout.
 - Expose the raw coverage percentage and URL matches through the public API.
+- Hand-write patterns for the fifteen licenses whose templates could not be converted, and tighten
+  the five where a more general pattern still wins (`dtoa`, `metamail`, `HPND-Netrek`,
+  `OpenSSL-standalone`, `X11-swapped` — see `data/expected-ids.tsv`).
+- Give callers a way to bound or clear the memoized DFA, so a long-lived process scanning diverse
+  license text is not stuck with process recycling as its only lever (see the README's Memory
+  section).
+- Add a `--from-file` mode to the gate so real-world license files, not just SPDX canonical texts,
+  can be used as fixtures. Canonical texts fill their variable slots with `<year>`-style
+  placeholders that the tokenizer discards, so they do not exercise a pattern's wildcards.
 
 ## [2026.7.0] - Unreleased
 

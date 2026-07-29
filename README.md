@@ -12,8 +12,9 @@ identify_license(open("LICENSE").read())
 
 - **No dependencies.** Nothing but the standard library.
 - **No native code, no network.** Pure Python, fully offline. The license corpus ships in the wheel.
-- **Fast.** ~2 ms to classify a typical license file, after a ~20 ms one-time load.
-- **423 SPDX licenses**, plus license-URL recognition.
+- **Fast.** ~2 ms to classify a typical license file, after a ~30 ms one-time load.
+- **693 licenses** — every non-deprecated SPDX identifier the matching templates support, plus
+  license-URL recognition.
 - **Designed not to guess.** A coverage threshold means it reports nothing rather than something
   wrong.
 
@@ -221,13 +222,44 @@ Measured on an Apple M-series laptop, classifying an 11 KB Apache 2.0 file:
 |                                                | |
 | ---------------------------------------------- | ------- |
 | `import licenseclassifier`                     | ~7 ms   |
-| First call (deserializes the compiled scanner) | ~20 ms  |
+| First call (deserializes the compiled scanner) | ~30 ms  |
 | Subsequent calls, median                       | ~2 ms   |
 
 The scanner is built once and cached for the life of the process, so batch workloads pay the
-startup cost a single time. The expensive part — compiling ~423 license patterns into a matcher,
-about a second of work — is done ahead of time at build time and shipped as a serialized artifact
-in the wheel, which is why the first call is 20 ms rather than 1.1 s.
+startup cost a single time. The expensive part — compiling ~700 license patterns into a matcher,
+about 1.4 s of work — is done ahead of time at build time and shipped as a serialized artifact in
+the wheel, which is why the first call is 30 ms rather than 1.4 s.
+
+### Memory
+
+Resident set size of the whole process, same machine, `python -m tools.benchmark`:
+
+| |  |
+| ------------------------------------------------- | ---------- |
+| Bare interpreter                                  | 24 MiB     |
+| `import licenseclassifier`                        | +0.3 MiB   |
+| Matcher deserialized (first call)                 | +18 MiB    |
+| First scan                                        | +34 MiB    |
+| 200 more scans of the same file                   | +0.1 MiB   |
+| 1000 files across 7 common licenses               | +6 MiB     |
+| Every one of 708 distinct licenses                | **+324 MiB** |
+| A second pass over all 708                        | +1 MiB     |
+
+**Memory tracks how varied your input is, not how much of it there is.** Matching runs a DFA that
+is built lazily and memoized, one entry per state reached, and the cache has no eviction — so
+scanning the same license a thousand times costs nothing after the first, while scanning a thousand
+*different* licenses keeps allocating. A scanner that has seen every license in the corpus holds
+about 600,000 memoized states and 400 MiB.
+
+For the common case — a repository scan, or a service classifying files that are mostly MIT and
+Apache-2.0 — that settles around 80 MiB and stays there. If you are scanning genuinely diverse
+license text in a long-lived process and 400 MiB is too much, the only lever today is process
+recycling: the cache is internal to the scanner object and there is no public way to clear it. That
+is a gap, and it is on the roadmap.
+
+This is inherited behaviour, not something introduced here: `google/licensecheck` builds its DFA the
+same way, for the same reason — a fully built DFA over 700 word-level patterns would be far larger
+than the part of it any real input touches.
 
 ## How it works
 
@@ -249,18 +281,36 @@ Four stages, all ported from `google/licensecheck`:
 
 Everything under `_engine/` is private. Treat only the three names above as the supported API.
 
-### Regenerating the compiled scanner
+### The license corpus, and regenerating the artifacts
 
-`_engine/scanner.bin.gz` is a build artifact derived from `_engine/licenses.json.gz`. If you change
-the license patterns or the matcher, regenerate it:
+Both files under `_engine/` are build artifacts. The reviewable sources live in
+[`data/`](data/README.md) as one plain-text LRE pattern per license, plus an `order.txt` that
+records which patterns exist and — because the matcher reports the lowest-numbered pattern that
+matches a span — in what priority order:
 
 ```bash
-python -m licenseclassifier._engine._build
+python -m tools.corpus build                 # data/ -> licenses.json.gz
+python -m licenseclassifier._engine._build   # licenses.json.gz -> scanner.bin.gz
 ```
 
-A test asserts the committed artifact matches a fresh compile, so CI will tell you if you forgot.
-At runtime, a missing, stale or unreadable artifact is not fatal — the scanner falls back to
-compiling from `licenses.json.gz`, just more slowly.
+Tests assert that the committed artifacts are the build of the committed sources, so CI will tell
+you if you forgot either step. At runtime, a missing, stale or unreadable `scanner.bin.gz` is not
+fatal — the scanner falls back to compiling from `licenses.json.gz`, just more slowly.
+
+### Refreshing the SPDX data
+
+The corpus tracks a pinned SPDX License List release, recorded in `data/spdx-version.json`. To move
+to a newer one:
+
+```bash
+python -m tools.refresh_spdx                 # or --release v3.29.0
+```
+
+That converts every license SPDX has added, adds a second pattern for any license whose canonical
+text SPDX has reworded since the existing pattern was written, rebuilds both artifacts and runs the
+gate. A [scheduled workflow](.github/workflows/spdx-refresh.yml) does the same monthly and opens a
+pull request; nothing is merged or released automatically, because a machine-converted pattern is a
+proposal, not a result.
 
 ## Accuracy
 
@@ -275,6 +325,26 @@ integrity of the prebuilt artifact — the last of these on every supported inte
 artifact is `marshal`-serialized and `marshal` is not guaranteed portable across Python versions.
 Vendoring the full parity suite is on the roadmap.
 
+### The corpus gate
+
+Patterns are also checked against the licenses they claim to identify. `tests/test_license_gates.py`
+scans the canonical text of all 708 SPDX licenses the corpus covers and asserts each one is
+identified as itself and nothing else, with every deliberate deviation recorded in
+`data/expected-ids.tsv` alongside its reason.
+
+That catches the two ways a corpus change goes wrong, both of which are otherwise silent. A pattern
+can stop matching its own license — which is what happened to nine patterns inherited from
+licensecheck when SPDX reworded those licenses after v3.10, so that a file carrying today's
+`Apache-1.0` or `PSF-2.0` text came back unidentified. Or a pattern can be loose enough to claim a
+*different* license's text, which is worse, because it is a confident wrong answer. Changing what
+any license text classifies as means changing a line in `expected-ids.tsv`, which puts the effect
+of a corpus change in the diff instead of in a test summary.
+
+Fifteen SPDX licenses have no pattern: the conversion of their template could not match even their
+own canonical text, so it was dropped rather than shipped as dead weight. `python -m
+tools.refresh_spdx` retries them on every run. Eleven more are excluded deliberately, because SPDX
+distinguishes them by something the license text does not state — see `data/excluded.txt`.
+
 ## Prior art and inspiration
 
 This project would not exist without the work below. Credit where it is due:
@@ -286,7 +356,7 @@ This project would not exist without the work below. Credit where it is due:
   with or endorsed by Google or the Go Authors.*
 - **[The SPDX License List](https://spdx.org/licenses/)** (data dedicated to the public domain
   under CC0-1.0) — the underlying source of the license identifiers, and of the matching templates
-  licensecheck's patterns were derived from.
+  both licensecheck's patterns and this project's generated ones were derived from.
 - **[google/licenseclassifier](https://github.com/google/licenseclassifier)** (Apache-2.0) — a
   separate Go project that shares this project's name but no code or data. Worth knowing about if
   you got here by searching for the name.

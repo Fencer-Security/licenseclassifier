@@ -1,0 +1,25 @@
+//**
+libutil-David-Nugent
+https://spdx.org/licenses/libutil-David-Nugent.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+Redistribution and use in source and binary forms, with or without modification, is permitted provided that the following conditions are met:
+__5__
+ Redistributions of source code must retain the above copyright notice immediately at the beginning of the file, without modification, this list of conditions, and the following disclaimer.
+__5__
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+__5__
+ This work was done expressly for inclusion into FreeBSD. Other use is permitted provided this notation is included.
+__5__
+ Absolutely no warranty of function or purpose is made by the
+((
+authors
+|| author Peter Wemm
+|| author David Nugent
+))
+ .
+__5__
+ Modifications may be freely made to this file providing the above conditions are met.

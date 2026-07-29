@@ -1,0 +1,11 @@
+//**
+SL
+https://spdx.org/licenses/SL.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+((
+SL License
+))??
+Everyone is permitted to do anything on this program including copying, modifying, and improving, unless you try to pretend that you wrote it. i.e., the above copyright notice has to appear in all copies. THE AUTHOR DISCLAIMS ANY RESPONSIBILITY WITH REGARD TO THIS SOFTWARE.

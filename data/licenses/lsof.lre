@@ -1,0 +1,19 @@
+//**
+lsof
+https://spdx.org/licenses/lsof.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+This software is not subject to any license of the American Telephone and Telegraph Company or the Regents of the University of California.
+
+Permission is granted to anyone to use this software for any purpose on any computer system, and to alter it and redistribute it freely, subject to the following restrictions:
+__5__
+   Neither the authors nor Purdue University are responsible for any consequences of the use of this software.
+__5__
+   The origin of this software must not be misrepresented, either by explicit claim or by omission. Credit to the authors and Purdue University must appear in documentation and sources.
+__5__
+   Altered versions must be plainly marked as such, and must not be misrepresented as being the original software.
+__5__
+   This notice may not be removed or altered.

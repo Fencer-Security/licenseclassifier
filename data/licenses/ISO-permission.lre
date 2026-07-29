@@ -1,0 +1,19 @@
+//**
+ISO-permission
+https://spdx.org/licenses/ISO-permission.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+Permission to copy in any form is granted for use with conforming
+((
+SGML systems
+|| to MHEG-3 engines
+))
+ and applications as defined
+((
+in ISO 8879,
+|| by this Recommendation
+))
+ provided this notice is included in all copies.

@@ -1,4 +1,8 @@
 include CHANGELOG.md
 recursive-include tests *
 recursive-include third_party *
+# The corpus sources and the tools that build the shipped artifact from them, so an sdist can
+# regenerate licenses.json.gz rather than only carry it.
+recursive-include data *
+recursive-include tools *.py
 global-exclude __pycache__ *.py[cod]

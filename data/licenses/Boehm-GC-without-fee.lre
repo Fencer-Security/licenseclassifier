@@ -1,0 +1,11 @@
+//**
+Boehm-GC-without-fee
+https://spdx.org/licenses/Boehm-GC-without-fee.json
+generated from the SPDX License List 3.28.0 matching template
+by tools/spdx_lre.py -- edit freely, the refresh tool never overwrites an existing file
+**//
+
+//** Copyright **//
+This material is provided "as is", with absolutely no warranty expressed or implied. Any use is at your own risk.
+
+Permission to use or copy this software for any purpose is hereby granted without fee, provided the above notices are retained on all copies. Permission to modify the code and to distribute modified code is granted, provided the above notices are retained, and a notice that the code was modified is included with the above copyright notice.
