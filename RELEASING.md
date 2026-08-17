@@ -28,28 +28,21 @@ flagged **BREAKING** in the changelog, removals get at least two months of `Depr
 first, `_engine/` is private, and a change in which licenses a given text matches is a normal
 release rather than a breaking one.
 
-## One-time setup on PyPI
+## What PyPI is configured to trust
 
-Done once per project, by someone with owner rights on the PyPI project. Nothing here lives in the
-repository.
+Configured once, on PyPI, under **Publishing**. Recorded here because renaming either of the last
+two values breaks publishing with an authentication error that does not mention the mismatch —
+`tests/test_release_docs.py` fails if this table and the workflow ever disagree.
 
-1. Sign in to PyPI → your project (or **Publishing** → **Add a pending publisher** if the project
-   does not exist yet) → **Publishing** → **Add a new publisher** → **GitHub**.
-2. Enter exactly:
+| Field             | Value                              |
+| ----------------- | ---------------------------------- |
+| Owner             | `Fencer-Security`                  |
+| Repository name   | `licenseclassifier`                |
+| Workflow name     | `release.yml`                      |
+| Environment name  | `pypi`                             |
 
-   | Field             | Value                              |
-   | ----------------- | ---------------------------------- |
-   | Owner             | `Fencer-Security`                  |
-   | Repository name   | `licenseclassifier`                |
-   | Workflow name     | `release.yml`                      |
-   | Environment name  | `pypi`                             |
-
-   The workflow name and environment name must match `.github/workflows/release.yml` — the filename
-   itself, and the `environment:` key on its `publish` job. `tests/test_release_docs.py` fails if
-   this table and the workflow ever disagree.
-3. In GitHub → **Settings** → **Environments**, create an environment named `pypi`. Optionally add
-   yourself as a required reviewer; the release then pauses for approval after the tests pass and
-   before anything is uploaded.
+The GitHub `pypi` environment is restricted to `v*` tags, so only a tagged build can reach the
+publish job.
 
 ## Cutting a release
 
@@ -122,6 +115,8 @@ git tag -d v2026.8.0 && git push --delete origin v2026.8.0
 **The publish step failed but the build was fine** (PyPI outage, missing approval). Re-run the failed
 jobs from the Actions tab, or trigger the workflow manually via **Run workflow**
 (`workflow_dispatch`) — it rebuilds from the current commit and the version guard still applies.
+Select the tag, not a branch: the `pypi` environment only accepts `v*` tags, so a dispatch from a
+branch builds and tests but stops before publishing.
 
 **A release is already on PyPI and is wrong.** PyPI does not allow re-uploading a version, even
 after deletion. Yank the bad release (PyPI → **Manage** → **Yank**, which hides it from resolvers
