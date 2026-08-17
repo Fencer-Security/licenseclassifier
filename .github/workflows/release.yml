@@ -11,6 +11,9 @@ name: Release
 # that does not deserialize -- is silent: the library falls back to compiling from source and
 # still returns correct answers, just far more slowly. A wheel can only be caught being wrong
 # by importing it from outside the source tree, which is what the smoke-test job does.
+#
+# The GitHub release is created last, from the CHANGELOG.md section for the version being
+# released, once the upload to PyPI has succeeded.
 
 on:
   push:
@@ -172,3 +175,47 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    # After `publish`, never beside it: a GitHub release announcing a version that is not on PyPI
+    # sends people to an install command that fails. The reverse gap is recoverable -- the release
+    # can be created by hand from the tag afterwards.
+    #
+    # Notes come from CHANGELOG.md rather than from GitHub's generated commit summary, which on
+    # this repository renders as "Merge pull request #1 from ...". `tools/changelog.py` exits
+    # non-zero if the section is missing or empty, so the job fails rather than publishing a
+    # release with no notes.
+    needs: publish
+    runs-on: ubuntu-latest
+    # Skipped on workflow_dispatch, which has no tag to release and would fail on the ref parse.
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      # Scoped to this job. The rest of the workflow stays read-only.
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            CHANGELOG.md
+            tools
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Take the release notes from the changelog
+        run: python -m tools.changelog "${GITHUB_REF_NAME#v}" -o "$RUNNER_TEMP/notes.md"
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # The distributions are attached for anyone fetching from a tag rather than from PyPI.
+        # PyPI's own copies carry the PEP 740 attestations that trusted publishing produced;
+        # these do not, so they are a convenience and not a provenance claim.
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "${GITHUB_REF_NAME#v}" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --verify-tag

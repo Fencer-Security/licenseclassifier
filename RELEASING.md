@@ -73,12 +73,16 @@ publish job.
    ```bash
    git commit -am "Release 2026.8.0"
    git push origin main
-   git tag v2026.8.0
+   git tag -m "licenseclassifier 2026.8.0" v2026.8.0
    git push origin v2026.8.0
    ```
 
+   `-m` because `tag.gpgsign` is set: a signed tag is an annotated tag, and `git tag v2026.8.0`
+   alone fails with `fatal: no tag message?`.
+
 6. **Watch the workflow.** `gh run watch` or the Actions tab. If you configured a required reviewer
-   on the `pypi` environment, approve it when it pauses.
+   on the `pypi` environment, approve it when it pauses. The GitHub release appears on its own once
+   the upload succeeds; there is nothing to write by hand.
 
 ## What CI verifies before it publishes
 
@@ -102,6 +106,20 @@ The `publish` job depends on both jobs below, so a failure in either means nothi
 - Checks out `tests/` **without** `src/`, so `import licenseclassifier` can only resolve to the
   installed wheel, and asserts the resolved path is in `site-packages`. Testing the working tree
   that happens to sit next to the wheel would prove nothing about the wheel.
+
+## The GitHub release
+
+`github-release` runs after `publish`, so a release page never advertises a version that failed to
+reach PyPI. Its notes are the `## [version]` section of [CHANGELOG.md](CHANGELOG.md), extracted by
+`python -m tools.changelog`, and the sdist and wheel are attached to it.
+
+Nothing about this needs doing by hand, but two failures are worth recognising: an extraction that
+finds no section fails the job rather than publishing an empty release — write the changelog entry
+and re-run — and a release page that never appeared while PyPI has the version is safe to create
+manually from the tag, which is the reason the ordering is this way round.
+
+`tests/test_changelog_notes.py` covers the extraction, including that the current version's section
+is parseable, so a changelog written in a shape the extractor cannot read fails on the pull request.
 
 ## When something goes wrong
 
