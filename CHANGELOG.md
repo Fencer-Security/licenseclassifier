@@ -27,6 +27,8 @@ carries it instead:
 
 ## [Unreleased]
 
+## [2026.8.0] - 2026-08-17
+
 ### Added
 
 - **Refreshed the license corpus from SPDX v3.10 to v3.28.0: 423 licenses to 693.** The vendored
@@ -87,7 +89,7 @@ carries it instead:
   `OFL-*-RFN`/`-no-RFN`, `CAL-1.0-Combined-Work-Exception`). See `data/excluded.txt`.
 - `Net-SNMP` and `bzip2-1.0.5` are still reported although SPDX has deprecated both. Deprecation
   removes an identifier from the list; it does not remove the text from the files that carry it.
-- Adopted CalVer (`YYYY.MM.MICRO`); the first release is `2026.7.0` rather than `0.1.0`. The version
+- Adopted CalVer (`YYYY.MM.MICRO`); the first release is `2026.8.0` rather than `0.1.0`. The version
   now lives only in `licenseclassifier.__version__`, with `pyproject.toml` reading it from there.
 - The test suite is now pytest, run across Python 3.10 through the 3.15 prerelease via `nox` with
   `uv`-provided interpreters (`uvx nox`). CI runs one job per version.
@@ -101,21 +103,6 @@ carries it instead:
   across the whole matrix and enforced in CI.
 - Added a release workflow that publishes to PyPI via a Trusted Publisher on a `v*` tag, gated on
   the built wheel being installed and run against the full suite on every supported interpreter.
-
-### Roadmap
-
-- Vendor the parity harness against `google/licensecheck`'s 672 testdata fixtures so the accuracy
-  claim is reproducible from a clean checkout.
-- Expose the raw coverage percentage and URL matches through the public API.
-- Hand-write patterns for the fifteen licenses whose templates could not be converted, and tighten
-  the five where a more general pattern still wins (`dtoa`, `metamail`, `HPND-Netrek`,
-  `OpenSSL-standalone`, `X11-swapped` — see `data/expected-ids.tsv`).
-- Give callers a way to bound or clear the memoized DFA, so a long-lived process scanning diverse
-  license text is not stuck with process recycling as its only lever (see the README's Memory
-  section).
-- Add a `--from-file` mode to the gate so real-world license files, not just SPDX canonical texts,
-  can be used as fixtures. Canonical texts fill their variable slots with `<year>`-style
-  placeholders that the tokenizer discards, so they do not exercise a pattern's wildcards.
 
 ## [2026.7.0] - Unreleased
 

@@ -13,4 +13,4 @@ __all__ = ["COVERAGE_THRESHOLD", "LicenseIdentificationResult", "identify_licens
 
 # CalVer, YYYY.MM.MICRO. This literal is the single source of truth: pyproject.toml reads it
 # via [tool.setuptools.dynamic]. Do not zero-pad the month -- PEP 440 would normalise it away.
-__version__ = "2026.7.0"
+__version__ = "2026.8.0"
