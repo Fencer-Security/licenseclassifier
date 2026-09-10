@@ -1,0 +1,58 @@
+name: Upgrade dependencies
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * THU"
+
+permissions:
+  contents: read
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update pinned GitHub Action SHAs
+        continue-on-error: true
+        env:
+          PINACT_VERSION: 3.10.1
+          PINACT_SHA256: c5234ff3a636cda47719c73ca33a0183a5f441581455eda8a0726e5030942b69
+        run: |
+          curl -fsSL -o /tmp/pinact.tar.gz \
+              "https://github.com/suzuki-shunsuke/pinact/releases/download/v${PINACT_VERSION}/pinact_linux_amd64.tar.gz"
+          echo "${PINACT_SHA256}  /tmp/pinact.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/pinact.tar.gz -C /tmp pinact
+          /tmp/pinact run --update >/tmp/pinact.out 2>&1 || true
+          printf "### GitHub Actions SHAs\n\n" > update.log
+          if grep -q '^::notice' /tmp/pinact.out; then
+              printf "| File | Updated |\n|---|---|\n" >> update.log
+              sed -nE 's|^::notice file=([^,]+),line=[0-9]+,title=[^:]+::[[:space:]]*(.*)$|\1\x01\2|p' \
+                  /tmp/pinact.out \
+                  | awk -F$'\x01' '{printf "| `%s` | `%s` |\n", $1, $2}' \
+                  >> update.log
+          else
+              printf "_No action SHA updates needed._\n" >> update.log
+          fi
+
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          commit-message: Upgrade dependencies
+          branch: bot/upgrade-dependencies
+          delete-branch: true
+          sign-commits: true
+          title: "Weekly dependency upgrades"
+          body-path: update.log
+          add-paths: |
+            .github/workflows/*.yml
+          team-reviewers: |
+            engineering

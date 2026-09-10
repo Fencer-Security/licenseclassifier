@@ -237,27 +237,29 @@ def main(argv: list[str] | None = None) -> int:
     for lid, coverage in sorted(unusable.items()):
         print(f"  skipped {lid}: the converted pattern matches only {coverage:.0f}% of its own text")
 
-    # The IDs worth vendoring a text for: everything current, plus anything the corpus still
-    # recognises that SPDX has since deprecated -- those patterns need gating too.
-    ids = sorted(set(release.current) | (known & release.deprecated))
-    write_texts(release, ids)
-    corpus.SPDX_VERSION_FILE.write_text(
-        json.dumps(
-            {
-                "spdx_license_list_version": tag,
-                "source": f"https://github.com/spdx/license-list-data/tree/{tag}",
-                "curated_from": recorded["curated_from"],
-            },
-            indent=2,
+    version_changed = recorded["spdx_license_list_version"] != tag
+    if added or reworded or version_changed:
+        # The IDs worth vendoring a text for: everything current, plus anything the corpus still
+        # recognises that SPDX has since deprecated -- those patterns need gating too.
+        ids = sorted(set(release.current) | (known & release.deprecated))
+        write_texts(release, ids)
+        corpus.SPDX_VERSION_FILE.write_text(
+            json.dumps(
+                {
+                    "spdx_license_list_version": tag,
+                    "source": f"https://github.com/spdx/license-list-data/tree/{tag}",
+                    "curated_from": recorded["curated_from"],
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
         )
-        + "\n",
-        encoding="utf-8",
-    )
 
-    corpus.build()
-    from licenseclassifier._engine import _build
+        corpus.build()
+        from licenseclassifier._engine import _build
 
-    _build.main()
+        _build.main()
 
     print()
     failures = gate.main([])
