@@ -13,6 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: Update uv.lock
+        run: |
+          uv lock --upgrade
+          if git diff --quiet uv.lock 2>/dev/null; then
+            printf "_No lockfile updates needed._\n" > uv-update.log
+          else
+            printf "### uv.lock\n\nuv.lock was updated with the latest compatible versions.\n" > uv-update.log
+          fi
 
       - name: Update pinned GitHub Action SHAs
         continue-on-error: true
@@ -36,6 +49,12 @@ jobs:
               printf "_No action SHA updates needed._\n" >> update.log
           fi
 
+      - name: Assemble the PR body
+        run: |
+          cat uv-update.log > body.md
+          echo >> body.md
+          cat update.log >> body.md
+
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: generate-token
         with:
@@ -51,8 +70,9 @@ jobs:
           delete-branch: true
           sign-commits: true
           title: "Weekly dependency upgrades"
-          body-path: update.log
+          body-path: body.md
           add-paths: |
             .github/workflows/*.yml
+            uv.lock
           team-reviewers: |
             engineering

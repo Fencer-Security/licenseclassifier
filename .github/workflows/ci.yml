@@ -21,6 +21,8 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         with:
           enable-cache: true
@@ -28,7 +30,7 @@ jobs:
         # uv resolves and downloads the interpreter, prereleases included, so 3.15 needs no
         # special casing here. The data file is named for the version, matching noxfile.py.
         run: >
-          uv run --group test --python ${{ matrix.python-version }}
+          uv run --frozen --group test --python ${{ matrix.python-version }}
           coverage run --data-file=.coverage.${{ matrix.python-version }} -m pytest
       - name: Upload coverage data
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -47,6 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         with:
           enable-cache: true
@@ -88,6 +92,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.14"
@@ -99,14 +105,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          # NEWEST_STABLE in noxfile.py: release artifacts are not built by a prerelease.
-          python-version: "3.14"
-      - run: pip install build twine
-      - run: python -m build
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          enable-cache: true
+      # NEWEST_STABLE in noxfile.py: release artifacts are not built by a prerelease.
+      - run: uv sync --frozen --group build-tools --python 3.14
+      - run: uv run --frozen --python 3.14 python -m build
       - name: Check distribution metadata
-        run: twine check --strict dist/*
+        run: uv run --frozen --python 3.14 twine check --strict dist/*
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dist
