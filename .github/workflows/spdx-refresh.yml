@@ -30,20 +30,34 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
 
+      - name: Validate release input
+        if: inputs.release != ''
+        run: |
+          if ! printf '%s' "$RELEASE" | grep -qE '^v[0-9]+\.[0-9]+(\.[0-9]+)?$'; then
+            echo "::error::Invalid release tag format: expected vX.Y or vX.Y.Z"
+            exit 1
+          fi
+        env:
+          RELEASE: ${{ inputs.release }}
+
       - name: Refresh the corpus
         id: refresh
+        env:
+          RELEASE_TAG: ${{ inputs.release }}
         run: |
-          uv sync --group test
+          uv sync --frozen --group test
           # Exits non-zero when the gate finds something unexpected. The pull request is opened
           # either way: a gate failure is the most important thing a refresh can report, and it
           # is much easier to read as a diff than as a log.
-          uv run python -m tools.refresh_spdx \
-            ${{ inputs.release && format('--release {0}', inputs.release) || '' }} \
+          uv run --frozen python -m tools.refresh_spdx \
+            ${RELEASE_TAG:+--release "$RELEASE_TAG"} \
             --summary-file "$RUNNER_TEMP/summary.md" | tee "$RUNNER_TEMP/gate.log" \
             && echo "gate=pass" >> "$GITHUB_OUTPUT" \
             || echo "gate=fail" >> "$GITHUB_OUTPUT"
@@ -64,7 +78,7 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         continue-on-error: true
         id: tests
-        run: uv run pytest -q
+        run: uv run --frozen pytest -q
 
       - name: Assemble the pull request body
         if: steps.diff.outputs.changed == 'true'

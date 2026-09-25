@@ -40,7 +40,8 @@ Changelog = "https://github.com/Fencer-Security/licenseclassifier/blob/main/CHAN
 # single source of truth for what the suite needs. tomllib is stdlib from 3.11 on; the
 # packaging-consistency test needs a reader on 3.10 too.
 test = ["pytest>=8.0", "coverage[toml]>=7.0", "tomli>=2.0; python_version < '3.11'"]
-dev = [{ include-group = "test" }, "nox>=2025.5.1"]
+build-tools = ["build>=1.0", "twine>=6.0"]
+dev = [{ include-group = "test" }, { include-group = "build-tools" }, "nox>=2025.5.1"]
 
 [build-system]
 requires = ["setuptools>=77"]
