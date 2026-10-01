@@ -716,3 +716,18 @@ mpich2 pattern=mpich2.spdx-v3.28.0.lre
 NASA-1.3 pattern=NASA-1.3.spdx-v3.28.0.lre
 PSF-2.0 pattern=PSF-2.0.spdx-v3.28.0.lre
 SGI-B-1.0 pattern=SGI-B-1.0.spdx-v3.28.0.lre
+
+# Generated from the SPDX License List v3.29.0 by tools/spdx_lre.py.
+atc-game
+Brian-Gladman-3-Clause-no-conversion
+BSD-2-Clause-pos-unchanged
+BSD-3-Clause-OpenWebUI
+BSD-ask-to-endorse
+BSD-Source-alt-GPL
+BSD-Source-Code-no-disclaimer
+Bugroff
+CC-BY-NC-3.0-IGO
+FDK-MPEG-H
+Hippocratic-3.0-core
+Informatica
+MVT-1.1
