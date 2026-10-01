@@ -27,6 +27,40 @@ carries it instead:
 
 ## [Unreleased]
 
+## [2026.10.0] - 2026-10-01
+
+### Added
+
+- **Refreshed the license corpus from SPDX v3.28.0 to v3.29.0: 693 licenses to 706.** The 13 new
+  identifiers are `atc-game`, `Brian-Gladman-3-Clause-no-conversion`, `BSD-2-Clause-pos-unchanged`,
+  `BSD-3-Clause-OpenWebUI`, `BSD-ask-to-endorse`, `BSD-Source-alt-GPL`,
+  `BSD-Source-Code-no-disclaimer`, `Bugroff`, `CC-BY-NC-3.0-IGO`, `FDK-MPEG-H`,
+  `Hippocratic-3.0-core`, `Informatica` and `MVT-1.1`, each converted from its SPDX matching
+  template by `tools/spdx_lre.py`. SPDX reworded no existing license in this release, so no pattern
+  gained a second variant. **No license that was identified before is identified differently or not
+  at all.**
+- GitHub releases are now created automatically after a successful PyPI upload, with this
+  changelog's section for the version as the notes and the sdist and wheel attached.
+
+### Changed
+
+- `BSD-2-Clause-pos-unchanged`'s canonical text is reported as `BSD-2-Clause`. The new variant adds
+  "in this position and unchanged" to the first condition, wording the `BSD-2-Clause` pattern
+  already accepts as optional, so the more general pattern matches the same span and wins on
+  priority. Narrowing it would have changed results for real files reported as `BSD-2-Clause` since
+  the port, so the deviation is recorded in `data/expected-ids.tsv` instead.
+- The same fifteen SPDX licenses as in 2026.8.0 remain uncovered because their converted templates
+  still do not match their own canonical text. The next refresh retries them.
+- The wheel is slightly larger: `licenses.json.gz` 950 KB → 968 KB, `scanner.bin.gz` 601 KB →
+  614 KB.
+- CI and release workflows are hardened against supply-chain risks: actions pinned to commit SHAs,
+  `persist-credentials: false` on every checkout, a committed `uv.lock` installed with `--frozen`,
+  and hash-checked requirements for the smoke tests. Build tooling moved to a `build-tools`
+  dependency group. A weekly workflow keeps the pins and lockfile current.
+- The monthly `spdx-refresh` workflow can open its pull request again (it failed in August and
+  September because the default token may not create pull requests), and it no longer opens one when
+  there is nothing new.
+
 ## [2026.8.0] - 2026-08-17
 
 ### Added
