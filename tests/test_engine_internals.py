@@ -147,8 +147,8 @@ class TestGluedWords:
     longer pattern -- otherwise a licence whose text has one glued word stops matching at all.
     """
 
-    @staticmethod
     @pytest.fixture(scope="class")
+    @staticmethod
     def two_patterns() -> Scanner:
         # P1 is P0 plus two more words, so after "gamma" the DFA state is both a match for P0
         # and mid-pattern for P1.

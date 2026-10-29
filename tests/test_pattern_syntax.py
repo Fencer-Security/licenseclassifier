@@ -84,8 +84,8 @@ class TestOptionalWords:
     """`??` binds to the single word before it, which is why patterns write
     `((free of charge))??` when a whole phrase is optional."""
 
-    @staticmethod
     @pytest.fixture(scope="class")
+    @staticmethod
     def pattern_scanner() -> Scanner:
         return scanner_for("alpha ?? beta gamma")
 
@@ -107,8 +107,8 @@ class TestOptionalWords:
 
 
 class TestAlternation:
-    @staticmethod
     @pytest.fixture(scope="class")
+    @staticmethod
     def pattern_scanner() -> Scanner:
         return scanner_for("(( alpha || beta )) gamma")
 
@@ -124,8 +124,8 @@ class TestComments:
     """`//** ... **//` annotates a pattern for a human; it must contribute no words, or every
     comment would become text the licence has to contain."""
 
-    @staticmethod
     @pytest.fixture(scope="class")
+    @staticmethod
     def pattern_scanner() -> Scanner:
         return scanner_for("alpha //** explain why **// beta")
 
@@ -140,8 +140,8 @@ class TestWildcardAgainstTheRealPatterns:
     """`__N__` is what lets one pattern cover every licence file that differs only in its
     copyright line. Exercised through the shipped patterns rather than a synthetic one."""
 
-    @staticmethod
     @pytest.fixture(scope="class")
+    @staticmethod
     def mit_body(license_text) -> str:
         text = license_text("multi-license")
         start = text.index("Permission is hereby granted, free of charge")
